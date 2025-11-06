@@ -1,34 +1,37 @@
-import { Poppins_400Regular, Poppins_600SemiBold, useFonts } from "@expo-google-fonts/poppins";
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { ActivityIndicator, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
 
-export default function Layout() {
-  // Načítanie fontov (ak chceš vlastné)
-  const [fontsLoaded] = useFonts({
-    Poppins_400Regular,
-    Poppins_600SemiBold,
-  });   
-
-  if (!fontsLoaded) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#007AFF" />
-      </View>
-    );
-  }
-
+export default function TabsLayout() {
   return (
-    <>
-      <StatusBar style="light" />
-      {/* Stack = navigácia medzi obrazovkami */}
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: "fade",
-          contentStyle: { backgroundColor: "#0E0E10" },
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "#58A6FF",
+        tabBarInactiveTintColor: "#94A3B8",
+        tabBarStyle: { backgroundColor: "#0D1117", borderTopColor: "#111827" }
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Domov",
+          tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" color={color} size={size} />
         }}
       />
-    </>
+      <Tabs.Screen
+        name="map"
+        options={{
+          title: "Mapa",
+          tabBarIcon: ({ color, size }) => <Ionicons name="map-outline" color={color} size={size} />
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profil",
+          tabBarIcon: ({ color, size }) => <Ionicons name="person-circle-outline" color={color} size={size} />
+        }}
+      />
+    </Tabs>
   );
 }
