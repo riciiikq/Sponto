@@ -1,6 +1,5 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, StatusBar } from "react-native";
-import { MotiView, MotiText } from "moti";
+import { MotiText, MotiView } from "moti";
+import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
   return (
