@@ -9,7 +9,7 @@ export default function OnboardingScreen() {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/logo.png')} style={styles.logo} />
+      <Image source={require('../assets/images/logo.png')} style={styles.logo} />
       <Text style={styles.title}>Vitaj v Sponto</Text>
       <Text style={styles.subtitle}>
         Spoj sa s priateľmi, vytváraj spontánne výjazdy a objavuj nové miesta.
