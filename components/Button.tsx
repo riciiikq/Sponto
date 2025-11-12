@@ -1,29 +1,31 @@
-// context/AuthContext.tsx
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React from 'react';
+import { TouchableOpacity, Text, StyleSheet, GestureResponderEvent } from 'react-native';
 
-type AuthContextType = {
-  user: string | null;
-  login: (userId: string) => void;
-  logout: () => void;
-};
+interface ButtonProps {
+  title: string;
+  onPress: (event: GestureResponderEvent) => void;
+}
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  login: () => {},
-  logout: () => {},
-});
-
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<string | null>(null);
-
-  const login = (userId: string) => setUser(userId);
-  const logout = () => setUser(null);
-
+export default function Button({ title, onPress }: ButtonProps) {
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
+    <TouchableOpacity style={styles.button} onPress={onPress}>
+      <Text style={styles.text}>{title}</Text>
+    </TouchableOpacity>
   );
-};
+}
 
-export const useAuth = () => useContext(AuthContext);
+const styles = StyleSheet.create({
+  button: {
+    backgroundColor: '#58A6FF',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  text: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
