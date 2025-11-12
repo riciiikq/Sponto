@@ -10,11 +10,11 @@ function Gate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const segments = useSegments();
 
-  /* useEffect(() => {
+  useEffect(() => {
     (async () => {
-      // 1) Prvé spustenie -> onboarding
+      // 1) First launch -> onboarding
       const seen = await AsyncStorage.getItem("sponto_seen_onboarding");
-      if (segments[0] !== "onboarding") {
+      if (!seen && segments[0] !== "onboarding") {
         router.replace("/onboarding");
         return;
       }
@@ -27,7 +27,7 @@ function Gate({ children }: { children: React.ReactNode }) {
         if (user && (inAuth || segments[0] === "onboarding")) router.replace("/(tabs)");
       }
     })();
-  }, [segments, user, loading]);
+  }, [segments, user, loading, router]);
 
   if (loading) {
     return (
@@ -37,7 +37,7 @@ function Gate({ children }: { children: React.ReactNode }) {
     );
   }
   return <>{children}</>;
-} */
+}
 
 export default function RootLayout() {
   return (
