@@ -1,29 +1,66 @@
-// context/AuthContext.tsx
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+// components/Button.tsx
+import React from 'react';
+import {
+  GestureResponderEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
-type AuthContextType = {
-  user: string | null;
-  login: (userId: string) => void;
-  logout: () => void;
-};
+interface ButtonProps {
+  title: string;
+  onPress: (event: GestureResponderEvent) => void;
+}
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  login: () => {},
-  logout: () => {},
-});
-
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<string | null>(null);
-
-  const login = (userId: string) => setUser(userId);
-  const logout = () => setUser(null);
-
+export default function Button({ title, onPress }: ButtonProps) {
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
+    <View style={styles.container}>
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [
+          styles.button,
+          pressed && styles.buttonPressed,
+        ]}
+      >
+        <Text style={styles.text}>{title}</Text>
+      </Pressable>
+    </View>
   );
-};
+}
 
-export const useAuth = () => useContext(AuthContext);
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+  },
+
+  button: {
+    width: '100%',
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    // profesionálny, moderný primary (Indigo)
+    backgroundColor: '#A855F7',
+
+    // elegantný tieň ako v iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.22,
+    shadowRadius: 16,
+    elevation: 6,
+  },
+
+  buttonPressed: {
+    opacity: 0.88,
+    transform: [{ scale: 0.97 }],
+  },
+
+  text: {
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+});
