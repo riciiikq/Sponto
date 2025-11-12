@@ -10,7 +10,7 @@ function Gate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const segments = useSegments();
 
-  useEffect(() => {
+  /* useEffect(() => {
     (async () => {
       // 1) Prvé spustenie -> onboarding
       const seen = await AsyncStorage.getItem("sponto_seen_onboarding");
@@ -37,7 +37,7 @@ function Gate({ children }: { children: React.ReactNode }) {
     );
   }
   return <>{children}</>;
-}
+} */
 
 export default function RootLayout() {
   return (
