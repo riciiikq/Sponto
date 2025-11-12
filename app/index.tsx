@@ -1,8 +1,7 @@
 // app/index.tsx
-import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import Button from '../components/Button';
+import React from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -15,7 +14,7 @@ export default function OnboardingScreen() {
         Spoj sa s priateľmi, vytváraj spontánne výjazdy a objavuj nové miesta.
       </Text>
 
-      <Button title="Začať" onPress={() => router.push('/login')} />
+      {/* <Button title="Začať" onPress={() => router.push('/login')} /> */}
     </View>
   );
 }
