@@ -12,8 +12,8 @@ import {
   TextInput,
   View,
 } from "react-native";
-import Button from "../components/Button";
-import { useAuth } from "../context/AuthContext";
+import Button from "../../components/Button";
+import { useAuth } from "../../context/AuthContext";
 
 type Errors = {
   name?: string;

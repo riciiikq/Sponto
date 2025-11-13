@@ -1,9 +1,12 @@
-import HomeScreen from "../screens/HomeScreen";
-import Placeholder from "../screens/_Placeholder";
-
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+// app/src/navigation/TabNavigator.tsx
+import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
+import { Platform } from "react-native";
+
+import HomeScreen from "../screens/HomeScreen";
+import TripsScreen from "../screens/TripsScreen";
+// tieto si buď vytvoríš ako placeholdery, alebo už máš:
 
 export type TabParamList = {
   Home: undefined;
@@ -18,52 +21,60 @@ const Tab = createBottomTabNavigator<TabParamList>();
 export default function TabNavigator() {
   return (
     <Tab.Navigator
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarLabelStyle: { fontSize: 11, fontWeight: "600" },
-        tabBarStyle: { height: 64, paddingBottom: 8, paddingTop: 6 },
-      }}
+        tabBarShowLabel: true,
+        tabBarActiveTintColor: "#6366F1",
+        tabBarInactiveTintColor: "#9CA3AF",
+        tabBarStyle: {
+          backgroundColor: "#020617",
+          borderTopColor: "#111827",
+          height: Platform.OS === "ios" ? 80 : 65,
+          paddingBottom: Platform.OS === "ios" ? 20 : 10,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: "600",
+        },
+        tabBarIcon: ({ color, size }) => {
+          let iconName: keyof typeof Ionicons.glyphMap = "home-outline";
+
+          if (route.name === "Home") iconName = "home-outline";
+          if (route.name === "Trips") iconName = "trail-sign-outline" as any;
+          if (route.name === "Map") iconName = "map-outline";
+          if (route.name === "Inbox") iconName = "chatbubbles-outline";
+          if (route.name === "Profile") iconName = "person-circle-outline";
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+      })}
     >
       <Tab.Screen
         name="Home"
         component={HomeScreen}
-        options={{
-          tabBarLabel: "Domov",
-          tabBarIcon: ({ size, color }) => <Ionicons name="home-outline" size={size} color={color} />,
-        }}
+        options={{ title: "Home" }}
       />
       <Tab.Screen
         name="Trips"
-        component={Placeholder}
-        options={{
-          tabBarLabel: "Tripy",
-          tabBarIcon: ({ size, color }) => <Ionicons name="calendar-outline" size={size} color={color} />,
-        }}
+        component={TripsScreen}
+        options={{ title: "Tripy" }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Map"
-        component={Placeholder}
-        options={{
-          tabBarLabel: "Mapa",
-          tabBarIcon: ({ size, color }) => <Ionicons name="map-outline" size={size} color={color} />,
-        }}
+        component={MapScreen}
+        options={{ title: "Mapa" }}
       />
       <Tab.Screen
         name="Inbox"
-        component={Placeholder}
-        options={{
-          tabBarLabel: "Doručené",
-          tabBarIcon: ({ size, color }) => <MaterialCommunityIcons name="message-text-outline" size={size} color={color} />,
-        }}
+        component={InboxScreen}
+        options={{ title: "Inbox" }}
       />
       <Tab.Screen
         name="Profile"
-        component={Placeholder}
-        options={{
-          tabBarLabel: "Profil",
-          tabBarIcon: ({ size, color }) => <Ionicons name="person-circle-outline" size={size} color={color} />,
-        }}
-      />
+        component={ProfileScreen}
+        options={{ title: "Profil" }}
+      /> */}
     </Tab.Navigator>
   );
 }

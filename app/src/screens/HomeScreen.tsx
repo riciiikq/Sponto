@@ -1,4 +1,4 @@
-// src/screens/HomeScreen.tsx (alebo app/src/screens/HomeScreen.tsx)
+// app/src/screens/HomeScreen.tsx (uprav cestu podľa projektu)
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useMemo } from "react";
@@ -15,6 +15,65 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { INVITES, SMART_SUGGESTIONS, UPCOMING_TRIPS } from "../data/mockTrips";
 import { Invite } from "../types/trips";
 
+const LOCALE: "sk" | "en" = "sk"; // neskôr napojíš na systém/užívateľa
+
+const STRINGS = {
+  sk: {
+    greetingMorning: "Dobré ráno",
+    greetingDay: "Ahoj",
+    greetingEvening: "Dobrý večer",
+    heroSubtitle: "Spontánne výlety, vyhliadky a jedlo po ceste.",
+    quickTonight: "Dnes večer",
+    quickTonightSub: "Vyhliadka + chill",
+    quickNearby: "Okolie",
+    quickNearbySub: "Tripy okolo teba",
+    quickPlan: "Naplánovať",
+    quickPlanSub: "Víkendový výlet",
+    sectionIdeas: "AI nápady pre teba",
+    sectionIdeasMore: "Viac nápadov",
+    sectionUpcoming: "Nadchádzajúce tripy",
+    sectionUpcomingCalendar: "Kalendár",
+    sectionLiveTrips: "Živé tripy v okolí",
+    sectionLiveTripsEmpty:
+      "Zatiaľ žiadne live tripy v okolí. Zapni lokalitu a skús neskôr.",
+    sectionInvites: "Pozvánky",
+    sectionInvitesEmpty:
+      "Zatiaľ žiadne pozvánky. Pozvi priateľov na spoločný trip.",
+    familyTitle: "Rodinný tip",
+    familyText: "Krátky výlet s detským ihriskom a kaviarňou v blízkosti cieľa.",
+    familyCta: "Rodinný trip",
+    fabLabel: "Vytvoriť rýchly trip",
+  },
+  en: {
+    greetingMorning: "Good morning",
+    greetingDay: "Hey",
+    greetingEvening: "Good evening",
+    heroSubtitle: "Spontaneous trips, viewpoints and food on the way.",
+    quickTonight: "Tonight",
+    quickTonightSub: "Viewpoint + chill",
+    quickNearby: "Nearby",
+    quickNearbySub: "Trips around you",
+    quickPlan: "Plan",
+    quickPlanSub: "Weekend escape",
+    sectionIdeas: "AI ideas for you",
+    sectionIdeasMore: "More ideas",
+    sectionUpcoming: "Upcoming trips",
+    sectionUpcomingCalendar: "Calendar",
+    sectionLiveTrips: "Live trips nearby",
+    sectionLiveTripsEmpty:
+      "No live trips nearby yet. Enable location and try again later.",
+    sectionInvites: "Invites",
+    sectionInvitesEmpty:
+      "No invites yet. Invite friends to join your trips.",
+    familyTitle: "Family tip",
+    familyText: "Short trip with playground and café near the destination.",
+    familyCta: "Family trip",
+    fabLabel: "Create quick trip",
+  },
+};
+
+const S = STRINGS[LOCALE];
+
 function formatDate(iso: string) {
   const d = new Date(iso);
   const dd = d.toLocaleDateString(undefined, {
@@ -29,16 +88,34 @@ function formatDate(iso: string) {
   return `${dd} • ${tt}`;
 }
 
+// neskôr nahradíš volaním API (napr. /ai/suggestions?userId=...)
+function getAiSuggestions() {
+  return SMART_SUGGESTIONS;
+}
+
+// neskôr nahradíš volaním API /live-trips?lat=..&lng=..
+const LIVE_TRIPS: { id: string; title: string; distanceKm: number }[] = [];
+
 export default function HomeScreen({ navigation }: any) {
   const trips = UPCOMING_TRIPS;
   const invites = INVITES;
+  const aiSuggestions = getAiSuggestions();
+
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 11) return S.greetingMorning;
+    if (hour < 18) return S.greetingDay;
+    return S.greetingEvening;
+  }, []);
+
+  const nextTrip = trips[0];
 
   const header = useMemo(
     () => (
       <View style={styles.header}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.greeting}>Ahoj 👋</Text>
-          <Text style={styles.subtitle}>Pripravený na spontánny výlet?</Text>
+          <Text style={styles.greeting}>{greeting} 👋</Text>
+          <Text style={styles.subtitle}>{S.heroSubtitle}</Text>
         </View>
         <Pressable
           style={({ pressed }) => [
@@ -51,7 +128,7 @@ export default function HomeScreen({ navigation }: any) {
         </Pressable>
       </View>
     ),
-    [navigation]
+    [greeting, navigation]
   );
 
   return (
@@ -61,7 +138,6 @@ export default function HomeScreen({ navigation }: any) {
       end={{ x: 1, y: 1 }}
       style={{ flex: 1 }}
     >
-      {/* Jemné glow pozadie */}
       <View style={styles.glowTop} />
       <View style={styles.glowBottom} />
 
@@ -72,45 +148,88 @@ export default function HomeScreen({ navigation }: any) {
         >
           {header}
 
+          {/* Hero card – večerný tip alebo najbližší trip */}
+          <Pressable
+            onPress={() =>
+              nextTrip && navigation.navigate("Trips", { id: nextTrip.id })
+            }
+            disabled={!nextTrip}
+            style={({ pressed }) => [
+              styles.heroCard,
+              pressed && { opacity: 0.9, transform: [{ scale: 0.99 }] },
+            ]}
+          >
+            <LinearGradient
+              colors={["#0F172A", "#020617"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.heroGradient}
+            >
+              <View style={styles.heroText}>
+                <Text style={styles.heroLabel}>{S.quickTonight}</Text>
+                <Text style={styles.heroTitle}>
+                  {nextTrip ? nextTrip.title : S.quickTonightSub}
+                </Text>
+                <Text style={styles.heroMeta}>
+                  {nextTrip
+                    ? `${formatDate(nextTrip.dateISO)} • ${nextTrip.place}`
+                    : S.quickTonightSub}
+                </Text>
+              </View>
+              <View style={styles.heroImageWrapper}>
+                <Image
+                  source={{
+                    uri: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200&q=60",
+                  }}
+                  style={styles.heroImage}
+                />
+              </View>
+            </LinearGradient>
+          </Pressable>
+
           {/* Quick actions */}
-          <View style={styles.actions}>
+          <View style={styles.actionsRow}>
             <QuickAction
-              icon={<Ionicons name="flash-outline" size={20} color="#F9FAFB" />}
-              label="Rýchly trip"
-              subtitle="Do pár minút"
-              onPress={() => navigation.navigate("Trips")}
-              accent="#F97316"
+              icon={<Ionicons name="moon-outline" size={18} color="#F9FAFB" />}
+              label={S.quickTonight}
+              subtitle={S.quickTonightSub}
+              onPress={() => navigation.navigate("Trips", { tonight: true })}
             />
             <QuickAction
-              icon={<Ionicons name="compass-outline" size={20} color="#F9FAFB" />}
-              label="Okolie"
-              subtitle="Tipy v blízkosti"
+              icon={<Ionicons name="map-outline" size={18} color="#F9FAFB" />}
+              label={S.quickNearby}
+              subtitle={S.quickNearbySub}
               onPress={() => navigation.navigate("Map")}
-              accent="#22C55E"
-            />
-          </View>
-          <View style={styles.actionsSecondRow}>
-            <QuickAction
-              icon={<Ionicons name="people-outline" size={20} color="#F9FAFB" />}
-              label="Pozvať partiu"
-              subtitle="Spoj kamošov"
-              onPress={() => navigation.navigate("Inbox")}
-              accent="#38BDF8"
-              fullWidth
             />
           </View>
 
-          {/* Smart suggestions */}
+          <View style={styles.actionsRow}>
+            <QuickAction
+              fullWidth
+              icon={
+                <Ionicons
+                  name="calendar-outline"
+                  size={18}
+                  color="#F9FAFB"
+                />
+              }
+              label={S.quickPlan}
+              subtitle={S.quickPlanSub}
+              onPress={() => navigation.navigate("Trips")}
+            />
+          </View>
+
+          {/* AI ideas */}
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Spontánne nápady</Text>
-            <Pressable>
-              <Text style={styles.sectionLink}>Zobraziť viac</Text>
+            <Text style={styles.sectionTitle}>{S.sectionIdeas}</Text>
+            <Pressable onPress={() => navigation.navigate("Trips", { ai: true })}>
+              <Text style={styles.sectionLink}>{S.sectionIdeasMore}</Text>
             </Pressable>
           </View>
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
-            data={SMART_SUGGESTIONS}
+            data={aiSuggestions}
             keyExtractor={(i) => i.id}
             contentContainerStyle={{ paddingRight: 16 }}
             renderItem={({ item }) => (
@@ -123,12 +242,15 @@ export default function HomeScreen({ navigation }: any) {
                   pressed && { opacity: 0.9 },
                 ]}
               >
-                <View style={styles.suggestionIcon}>
-                  <MaterialCommunityIcons
-                    name="star-four-points-outline"
-                    size={18}
-                    color="#FACC15"
-                  />
+                <View style={styles.suggestionHeader}>
+                  <View style={styles.suggestionIcon}>
+                    <MaterialCommunityIcons
+                      name="sparkles"
+                      size={16}
+                      color="#FACC15"
+                    />
+                  </View>
+                  <Text style={styles.suggestionTag}>AI</Text>
                 </View>
                 <Text style={styles.suggestionTitle}>{item.title}</Text>
                 <Text style={styles.suggestionSub}>{item.sub}</Text>
@@ -138,14 +260,16 @@ export default function HomeScreen({ navigation }: any) {
 
           {/* Upcoming trips */}
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Nadchádzajúce tripy</Text>
+            <Text style={styles.sectionTitle}>{S.sectionUpcoming}</Text>
             <Pressable onPress={() => navigation.navigate("Trips")}>
-              <Text style={styles.sectionLink}>Kalendár</Text>
+              <Text style={styles.sectionLink}>
+                {S.sectionUpcomingCalendar}
+              </Text>
             </Pressable>
           </View>
 
           {trips.length === 0 ? (
-            <EmptyRow text="Zatiaľ nemáš naplánované žiadne tripy." />
+            <EmptyRow text="Zatiaľ nemáš naplánované tripy. Skús AI nápady vyššie." />
           ) : (
             trips.map((trip) => (
               <Pressable
@@ -153,13 +277,13 @@ export default function HomeScreen({ navigation }: any) {
                 onPress={() => navigation.navigate("Trips", { id: trip.id })}
                 style={({ pressed }) => [
                   styles.tripCard,
-                  pressed && { opacity: 0.9 },
+                  pressed && { opacity: 0.92 },
                 ]}
               >
                 <View style={styles.tripImageWrapper}>
                   <Image
                     source={{
-                      uri: "https://images.unsplash.com/photo-1508766206392-8bd5cf550d1b?w=1200&q=60",
+                      uri: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&q=60",
                     }}
                     style={styles.tripCover}
                   />
@@ -191,13 +315,45 @@ export default function HomeScreen({ navigation }: any) {
             ))
           )}
 
+          {/* Live trips nearby – pripravené na realtime mapu */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>{S.sectionLiveTrips}</Text>
+            <Pressable onPress={() => navigation.navigate("Map")}>
+              <Text style={styles.sectionLink}>Mapa</Text>
+            </Pressable>
+          </View>
+          {LIVE_TRIPS.length === 0 ? (
+            <EmptyRow text={S.sectionLiveTripsEmpty} />
+          ) : (
+            LIVE_TRIPS.map((t) => (
+              <View key={t.id} style={styles.liveRow}>
+                <View style={styles.liveDot} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.liveTitle}>{t.title}</Text>
+                  <Text style={styles.liveMeta}>{t.distanceKm} km od teba</Text>
+                </View>
+                <Pressable
+                  onPress={() =>
+                    navigation.navigate("Map", { focusTripId: t.id })
+                  }
+                  style={({ pressed }) => [
+                    styles.liveBtn,
+                    pressed && { opacity: 0.85 },
+                  ]}
+                >
+                  <Text style={styles.liveBtnText}>Detail</Text>
+                </Pressable>
+              </View>
+            ))
+          )}
+
           {/* Invites */}
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Pozvánky</Text>
+            <Text style={styles.sectionTitle}>{S.sectionInvites}</Text>
             <View />
           </View>
           {invites.length === 0 ? (
-            <EmptyRow text="Zatiaľ žiadne pozvánky. Pozvi priateľov na trip." />
+            <EmptyRow text={S.sectionInvitesEmpty} />
           ) : (
             invites.map((i) => (
               <InviteRow
@@ -215,10 +371,8 @@ export default function HomeScreen({ navigation }: any) {
               <Ionicons name="sparkles-outline" size={18} color="#FBBF24" />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.bannerTitle}>Tip pre rodiny</Text>
-              <Text style={styles.bannerText}>
-                Ihrisko + kaviareň v blízkosti cieľa. Skús „Rodinné doobeda“.
-              </Text>
+              <Text style={styles.bannerTitle}>{S.familyTitle}</Text>
+              <Text style={styles.bannerText}>{S.familyText}</Text>
             </View>
             <Pressable
               onPress={() =>
@@ -226,19 +380,19 @@ export default function HomeScreen({ navigation }: any) {
               }
               style={styles.bannerBtn}
             >
-              <Text style={styles.bannerBtnText}>Vyskúšať</Text>
+              <Text style={styles.bannerBtnText}>{S.familyCta}</Text>
             </Pressable>
           </View>
         </ScrollView>
 
-        {/* FAB – rýchly trip */}
+        {/* FAB */}
         <Pressable
           onPress={() => navigation.navigate("Trips", { quickCreate: true })}
           style={({ pressed }) => [
             styles.fab,
             pressed && { transform: [{ scale: 0.96 }] },
           ]}
-          accessibilityLabel="Vytvoriť rýchly trip"
+          accessibilityLabel={S.fabLabel}
         >
           <Ionicons name="add" size={24} color="#FFFFFF" />
         </Pressable>
@@ -254,14 +408,12 @@ function QuickAction({
   label,
   subtitle,
   onPress,
-  accent,
   fullWidth,
 }: {
   icon: React.ReactNode;
   label: string;
   subtitle?: string;
   onPress: () => void;
-  accent: string;
   fullWidth?: boolean;
 }) {
   return (
@@ -269,11 +421,10 @@ function QuickAction({
       onPress={onPress}
       style={({ pressed }) => [
         styles.action,
-        fullWidth && { flex: 1.7 },
-        pressed && { opacity: 0.85 },
+        fullWidth && { flex: 1 },
+        pressed && { opacity: 0.9 },
       ]}
     >
-      <View style={[styles.actionAccent, { backgroundColor: accent }]} />
       <View style={styles.actionIcon}>{icon}</View>
       <View style={{ flex: 1 }}>
         <Text style={styles.actionLabel}>{label}</Text>
@@ -377,7 +528,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 14,
+    marginBottom: 16,
     marginTop: 6,
   },
   greeting: { fontSize: 22, fontWeight: "800", color: "#F9FAFB" },
@@ -390,19 +541,55 @@ const styles = StyleSheet.create({
     backgroundColor: "#020617",
   },
 
-  actions: {
+  heroCard: {
+    borderRadius: 20,
+    overflow: "hidden",
+    marginBottom: 14,
+  },
+  heroGradient: {
     flexDirection: "row",
-    gap: 10,
-    marginTop: 4,
+    padding: 14,
+    alignItems: "center",
+  },
+  heroText: {
+    flex: 1,
+    paddingRight: 10,
+  },
+  heroLabel: {
+    fontSize: 12,
+    color: "#A5B4FC",
     marginBottom: 4,
   },
-  actionsSecondRow: {
+  heroTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#F9FAFB",
+    marginBottom: 4,
+  },
+  heroMeta: {
+    fontSize: 12,
+    color: "#9CA3AF",
+  },
+  heroImageWrapper: {
+    width: 90,
+    height: 90,
+    borderRadius: 16,
+    overflow: "hidden",
+    backgroundColor: "#020617",
+  },
+  heroImage: {
+    width: "100%",
+    height: "100%",
+  },
+
+  actionsRow: {
     flexDirection: "row",
+    gap: 10,
     marginBottom: 8,
   },
   action: {
     flex: 1,
-    borderRadius: 18,
+    borderRadius: 16,
     paddingVertical: 12,
     paddingHorizontal: 12,
     backgroundColor: "#020617",
@@ -411,11 +598,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-  },
-  actionAccent: {
-    width: 4,
-    alignSelf: "stretch",
-    borderRadius: 999,
   },
   actionIcon: {
     width: 30,
@@ -433,7 +615,7 @@ const styles = StyleSheet.create({
   actionSubtitle: {
     fontSize: 11,
     color: "#9CA3AF",
-    marginTop: 2,
+    marginTop: 1,
   },
 
   sectionHeader: {
@@ -460,14 +642,23 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#111827",
   },
+  suggestionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
+    justifyContent: "space-between",
+  },
   suggestionIcon: {
-    width: 28,
-    height: 28,
+    width: 26,
+    height: 26,
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#0F172A",
-    marginBottom: 8,
+  },
+  suggestionTag: {
+    fontSize: 10,
+    color: "#A5B4FC",
   },
   suggestionTitle: { fontWeight: "700", marginBottom: 2, color: "#E5E7EB" },
   suggestionSub: { fontSize: 12, opacity: 0.8, color: "#9CA3AF" },
@@ -482,7 +673,7 @@ const styles = StyleSheet.create({
   },
   tripImageWrapper: {
     width: "100%",
-    height: 150,
+    height: 140,
     overflow: "hidden",
   },
   tripCover: {
@@ -527,6 +718,44 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 10,
     fontWeight: "700",
+    color: "#E5E7EB",
+  },
+
+  liveRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#111827",
+    padding: 10,
+    marginBottom: 8,
+    backgroundColor: "#020617",
+    gap: 10,
+  },
+  liveDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 999,
+    backgroundColor: "#22C55E",
+  },
+  liveTitle: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#F9FAFB",
+  },
+  liveMeta: {
+    fontSize: 11,
+    color: "#9CA3AF",
+  },
+  liveBtn: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "#4B5563",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  liveBtnText: {
+    fontSize: 11,
     color: "#E5E7EB",
   },
 

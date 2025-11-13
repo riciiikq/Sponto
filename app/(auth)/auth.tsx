@@ -12,8 +12,8 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import Button from '../components/Button';
-import { useAuth } from '../context/AuthContext';
+import Button from '../../components/Button';
+import { useAuth } from '../../context/AuthContext';
 
 type Errors = {
   email?: string;
@@ -66,7 +66,7 @@ export default function AuthScreen() {
       login(user.email);
 
       // po prihlásení redirect na Home (upravenú route si vieš zmeniť)
-      router.replace('/src/screens/HomeScreen');
+      router.replace('/home');
     } catch (e: any) {
       setErrors((prev) => ({
         ...prev,
@@ -86,7 +86,7 @@ export default function AuthScreen() {
       // TODO: nahradiť reálnym Google OAuth (expo-auth-session / Firebase / Supabase)
       const user = await fakeSocialLogin('google');
       login(user.email);
-      router.replace('/src/screens/HomeScreen');
+      router.replace('/home');
     } catch (e: any) {
       setErrors((prev) => ({
         ...prev,
@@ -104,7 +104,7 @@ export default function AuthScreen() {
       // TODO: nahradiť reálnym Instagram OAuth / vlastným backend flow
       const user = await fakeSocialLogin('instagram');
       login(user.email);
-      router.replace('/src/screens/HomeScreen');
+      router.replace('/home');
     } catch (e: any) {
       setErrors((prev) => ({
         ...prev,
