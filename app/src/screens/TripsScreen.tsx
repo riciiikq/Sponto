@@ -3,16 +3,16 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useMemo, useState } from "react";
 import {
-    FlatList,
-    Image,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SMART_SUGGESTIONS, UPCOMING_TRIPS } from "../data/mockTrips";
-import { Trip } from "../types/trips";
+import { Trip } from "../src/types/trips";
 
 const LOCALE: "sk" | "en" = "sk";
 
@@ -211,7 +211,7 @@ export default function TripsScreen({ navigation }: any) {
                     <View style={styles.aiTagRow}>
                       <View style={styles.aiTagBubble}>
                         <MaterialCommunityIcons
-                          name="sparkles"
+                          name={"sparkles" as any}
                           size={14}
                           color="#FACC15"
                         />
