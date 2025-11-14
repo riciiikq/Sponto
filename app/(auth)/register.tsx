@@ -121,7 +121,7 @@ export default function RegisterScreen() {
       // TODO: reálne Instagram OAuth / vlastné backend flow
       const user = await fakeSocialSignup("instagram");
       login(user.email);
-      router.replace("/src/screens/HomeScreen");
+      router.replace("/home");
     } catch (e: any) {
       setErrors((prev) => ({
         ...prev,
