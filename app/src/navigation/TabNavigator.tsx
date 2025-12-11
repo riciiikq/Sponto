@@ -6,7 +6,7 @@ import { Platform } from "react-native";
 
 import HomeScreen from "../screens/HomeScreen";
 import TripsScreen from "../screens/TripsScreen";
-// tieto si buď vytvoríš ako placeholdery, alebo už máš:
+// tieto si buď vytvoríš ako placeholdery, alebo už máš: 
 
 export type TabParamList = {
   Home: undefined;
